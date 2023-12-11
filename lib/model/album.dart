@@ -1,5 +1,5 @@
-import 'package:band_open_api/model/author.dart';
-import 'package:band_open_api/model/photo.dart';
+import 'package:thanks_counter/model/author.dart';
+import 'package:thanks_counter/model/photo.dart';
 
 class Album {
   final List<Photo> latestPhotos;

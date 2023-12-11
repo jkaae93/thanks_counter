@@ -1,4 +1,4 @@
-import 'package:band_open_api/model/author.dart';
+import 'package:thanks_counter/model/author.dart';
 
 class Photo {
   final int height;
