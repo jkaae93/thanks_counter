@@ -1,11 +1,15 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:thanks_counter/app/core/endpoints/endpoints.dart';
 import 'package:thanks_counter/app/data/dtos/board_dto.dart';
+import 'package:thanks_counter/app/utils/log.dart';
+import 'package:thanks_counter/model/post.dart';
 
 class CounterController extends GetxController {
+  List<Post> posts = [];
+  bool _calling = false;
   List<BoardDto> datas = [];
   Map<String, int> authors = {};
   Map<String, int> emotion = {};
@@ -18,7 +22,7 @@ class CounterController extends GetxController {
 
   Future<void> init({String? file}) async {
     try {
-      Logger().d(file != null);
+      Log.d(file != null);
       Map<String, dynamic> json = jsonDecode(file ??'');
 
       datas =
@@ -26,15 +30,15 @@ class CounterController extends GetxController {
 
       for (var d in datas) {
         d.resultData?.items?.forEach((item) {
-          updateCounter(item.author?.name ?? '');
-          updateEmotion(item.postNo ?? 0, item.emotionCount ?? 0);
-          emotionUrl['${item.postNo ?? 0}'] = item.webUrl ?? '';
-          emotionName['${item.postNo ?? 0}'] = item.author?.name ?? '';
-          if (item.content!.contains('band:refer user_no')) {
+          updateCounter(item.author.name);
+          updateEmotion(item.postKey, item.emotionCount);
+          emotionUrl[item.postKey] = item.postKey;
+          emotionName[item.postKey] = item.author.name;
+          if (item.content.contains('band:refer user_no')) {
             RegExp regex =
                 RegExp(r'<band:refer user_no="(\d+)">(.*?)<\/band:refer>');
 
-            Iterable<Match> matches = regex.allMatches(item.content ?? '');
+            Iterable<Match> matches = regex.allMatches(item.content);
 
             for (Match match in matches) {
               String userNo = match.group(1)!;
@@ -46,9 +50,30 @@ class CounterController extends GetxController {
         });
       }
     } catch (e) {
-      Logger().e(e);
+      Log.e(e);
     }
     update();
+  }
+
+  void counter(List<Post> datas) {
+    for (var d in datas) {
+      updateCounter(d.author.name);
+      updateEmotion(d.postKey, d.emotionCount);
+      emotionUrl[d.postKey] = d.postKey;
+      emotionName[d.postKey] = d.author.name;
+      if (d.content.contains('band:refer user_no')) {
+        RegExp regex = RegExp(r'<band:refer user_no="(\d+)">(.*?)<\/band:refer>');
+
+        Iterable<Match> matches = regex.allMatches(d.content);
+
+        for (Match match in matches) {
+          String userNo = match.group(1)!;
+          String content = match.group(2)!;
+          userNumbers[userNo] = content;
+          updateCountUser(userNo);
+        }
+      }
+    }
   }
 
   void updateCounter(String name) {
@@ -63,29 +88,19 @@ class CounterController extends GetxController {
     mentioned[userNum] = count;
   }
 
-  void updateEmotion(int postNo, int emotionCount) {
-    emotion['$postNo'] = emotionCount;
+  void updateEmotion(String postNo, int emotionCount) {
+    emotion[postNo] = emotionCount;
   }
 
   String getAuthors() {
-    return authors.entries
-        .map((e) => '\"${e.key}\", \"${e.value}\"\n')
-        .toList()
-        .toString();
+    return authors.entries.map((e) => '"${e.key}", "${e.value}"\n').toList().toString();
   }
 
   String getEmo() {
-    return emotion.entries
-        .map((e) =>
-            ' \"${emotionName[e.key]}\", \"${e.key}\", \"${e.value}\", ${emotionUrl[e.key]} \n')
-        .toList()
-        .toString();
+    return emotion.entries.map((e) => ' "${emotionName[e.key]}", "${e.key}", "${e.value}", ${emotionUrl[e.key]} \n').toList().toString();
   }
 
   String getMentions() {
-    return mentioned.entries
-        .map((e) => '\"${userNumbers[e.key]}\", \"${e.value}\"\n')
-        .toList()
-        .toString();
+    return mentioned.entries.map((e) => '"${userNumbers[e.key]}", "${e.value}"\n').toList().toString();
   }
 }

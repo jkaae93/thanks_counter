@@ -33,16 +33,25 @@ class Post {
       content: json['content'] as String? ?? '',
       commentCount: json['comment_count'] as int? ?? 0,
       createdAt: json['created_at'] as int? ?? 0,
-      photos: (json['photos'] as List<dynamic>?)
-              ?.map((e) => Photo.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      photos: (json['photos'] as List<dynamic>?)?.map((e) => Photo.fromJson(e as Map<String, dynamic>)).toList() ?? [],
       emotionCount: json['emotion_count'] as int? ?? 0,
       bandKey: json['band_key'] as String? ?? '',
-      sticker: Map<int, Sticker>.from(json['sticker']
-              ?.map((k, v) => MapEntry(int.parse(k), Sticker.fromJson(v))) ??
-          {}),
+      sticker: Map<int, Sticker>.from(json['sticker']?.map((k, v) => MapEntry(int.parse(k), Sticker.fromJson(v))) ?? {}),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'author': author.toString().split('\n').join(', '),
+      'postKey': postKey,
+      'content': content,
+      'commentCount': commentCount,
+      'createdAt': createdAt,
+      'photos': photos.map((e) => e.toString().split('\n').join(', ')).toList(),
+      'emotionCount': emotionCount,
+      'bandKey': bandKey,
+      'sticker': sticker.entries.map((entry) => '${entry.key}=${entry.value.toString().split('\n').join(', ')}'),
+    };
   }
 
   @override

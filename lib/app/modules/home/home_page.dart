@@ -30,29 +30,29 @@ class HomePage extends GetView<HomeController> {
             ),
             TextButton(
               onPressed: () async {
-                FilePickerResult? ret = await FilePicker.platform.pickFiles();
-                String loaded = '';
+                // FilePickerResult? ret = await FilePicker.platform.pickFiles();
+                // String loaded = '';
                 try {
-                  if (Platform.isMacOS) {
-                    File file = File(ret!.files.single.path!);
-                    if (file.path.split(',').last.contains('json')) {
-                      loaded = await file.readAsString();
-                    } else {
-                      throw Exception(
-                          'File format is wrong. please upload only \'.json\'');
-                    }
-                  }
+                  //   if (Platform.isMacOS) {
+                  //     File file = File(ret!.files.single.path!);
+                  //     if (file.path.split(',').last.contains('json')) {
+                  //       loaded = await file.readAsString();
+                  //     } else {
+                  //       throw Exception(
+                  //           'File format is wrong. please upload only \'.json\'');
+                  //     }
+                  //   }
+                  //   Get.put<CounterController>(CounterController());
+                  //   Get.find<CounterController>().init(file: loaded);
+                  //   Get.to(() => const CounterPage());
+                  // } on UnsupportedError {
+                  //   if (ret != null) {
+                  //     Uint8List fileBytes = ret.files.first.bytes ?? Uint8List(0);
+                  //     loaded = String.fromCharCodes(fileBytes);
                   Get.put<CounterController>(CounterController());
-                  Get.find<CounterController>().init(file: loaded);
-                  Get.to(() => const CounterPage());
-                } on UnsupportedError {
-                  if (ret != null) {
-                    Uint8List fileBytes = ret.files.first.bytes ?? Uint8List(0);
-                    loaded = String.fromCharCodes(fileBytes);
-                    Get.put<CounterController>(CounterController());
-                    Get.find<CounterController>().init(file: loaded);
-                    Get.to(() => const CounterPage());
-                  }
+                  Get.find<CounterController>().init();
+                  //     Get.to(() => const CounterPage());
+                  //   }
                 } catch (e) {
                   Get.showSnackbar(
                     GetSnackBar(
@@ -63,7 +63,7 @@ class HomePage extends GetView<HomeController> {
                   );
                 }
               },
-              child: const Text('upload'),
+              child: const Text('load post'),
             ),
           ],
         ),
